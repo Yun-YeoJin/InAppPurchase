@@ -37,4 +37,30 @@ platform :ios do
         skip_waiting_for_build_processing: true
       )
   end
+
+  desc "Push a new beta build to TestFlight"
+  lane :firebase do
+	
+    match(type: "appstore", force_for_new_devices: true)
+    match(type: "appstore", readonly: true)
+
+    increment_build_number(
+        build_number: latest_testflight_build_number + 1
+    )
+
+    build_app( 
+	project: "InAppPurchase.xcodeproj",
+     	scheme: "InAppPurchase"
+    )
+
+    firebase_app_distribution(
+	app: ENV["FIREBASE_APP_ID"],
+	firebase_cli_token: ENV["FIREBASE_CLI_TOKEN"],
+	release_notes: "FireBase_Test_App_Distribution",
+	testers: "yeojin.yun@medisolution.co.kr",
+	#group: "medi-ios"
+	debug: true
+    )
+  end
+	
 end
